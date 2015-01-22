@@ -1,0 +1,28 @@
+{
+  "name": "hubot-untappd",
+  "version": "0.0.1",
+  "description": "Integrate hubot with untappd",
+  "main": "index.coffee",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mikael Brassman",
+  "license": "MIT",
+  "keywords": [
+    "hubot",
+    "beer",
+    "untappd",
+    "pub",
+    "chatbot"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/spoike/hubot-untappd.git"
+  },
+  "dependencies": {
+    "cron": "^1.0.6",
+    "lodash": "^2.4.1",
+    "moment": "^2.9.0",
+    "node-untappd": "^0.3.1"
+  }
+}
