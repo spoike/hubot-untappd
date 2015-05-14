@@ -41,7 +41,7 @@ formatCheckin = (checkin, withName) ->
   beer_name = checkin.beer.beer_name
   user_name = "#{checkin.user.first_name} #{checkin.user.last_name.charAt(0)}"
   brewery_name = checkin.brewery.brewery_name
-  rating_score = Math.floor checkin.rating_score
+  rating_score = checkin.rating_score
   rating_phrase = if rating_score > 0 then "and rated it *#{rating_score}/5*" else ""
 
   return ":beer: *#{user_name}* drank a *#{beer_name}* from _#{brewery_name}_ #{rating_phrase}" if withName
