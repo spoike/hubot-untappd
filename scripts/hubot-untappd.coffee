@@ -37,14 +37,30 @@ getUserFeed = (user, cb) ->
   else
     untappd.userFeed handleUserFeed(user, cb), user_name, 1
 
+availableActionNames = (rating) ->
+  if rating && rating <= 2.0
+    # bad
+    ["choked down a", "managed to finish a", "reluctantly tried a", "kept down a", "shouldn't have had a"]
+  else if !rating || rating <= 4.0
+    # normal
+    ["drank a", "had a", "purchased a", "slammed a", "chugged a", "downed a", "imbibed a", "hammed a", "slurped a"]
+  else
+    # good
+    ["thoroughly enjoyed a", "quenched their thurst with a", "drowned themselves in"]
+
+actionNameFor = (rating) ->
+  possible = availableActionNames(rating)
+  possible[Math.floor(Math.random() * possible.length)]
+
 formatCheckin = (checkin, withName) ->
   beer_name = checkin.beer.beer_name
   user_name = "#{checkin.user.first_name} #{checkin.user.last_name.charAt(0)}"
   brewery_name = checkin.brewery.brewery_name
   rating_score = checkin.rating_score
   rating_phrase = if rating_score > 0 then "and rated it *#{rating_score}/5*" else ""
+  action = actionNameFor(rating_score)
 
-  return ":beer: *#{user_name}* drank a *#{beer_name}* from _#{brewery_name}_ #{rating_phrase}" if withName
+  return ":beer: *#{user_name}* #{action} *#{beer_name}* from _#{brewery_name}_ #{rating_phrase}" if withName
   ":beer: *#{beer_name}* from _#{brewery_name}_ #{rating_phrase}"
 
 module.exports = (robot) ->
