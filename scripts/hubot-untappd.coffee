@@ -83,7 +83,7 @@ module.exports = (robot) ->
               checkin.checkin_id > user.untappd.max_id
             .each (checkin) ->
               m = formatCheckin(checkin, true)
-              robot.messageRoom ROOM, ":beer: #{m}"
+              robot.messageRoom ROOM, m
 
   updater = new cronjob UPDATE_TIME,
     -> update()
