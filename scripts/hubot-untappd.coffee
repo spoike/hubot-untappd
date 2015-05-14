@@ -12,7 +12,7 @@ _ = require 'lodash'
 cronjob = require("cron").CronJob
 moment = require "moment"
 
-UPDATE_TIME = "00 */10 * * * 0-6" # Sun-Sat job every 10 minutes
+UPDATE_TIME = "00 * * * * *" # erry minute of erry day, son
 ROOM = process.env.HUBOT_UNTAPPD_ROOM || "beer"
 
 untappd.setClientId process.env.HUBOT_UNTAPPD_CLIENTID
