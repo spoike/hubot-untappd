@@ -63,7 +63,6 @@ module.exports = (robot) ->
 
   update = () ->
     untappdUserIds = getUntappdUserIds()
-    #console.log "Updating #{untappdUserIds.length} users"
     if untappdUserIds and untappdUserIds.length > 0
       _.each untappdUserIds, (userId) ->
         user = robot.brain.userForId userId
