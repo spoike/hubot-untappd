@@ -59,9 +59,10 @@ formatCheckin = (checkin, withName) ->
   rating_score = checkin.rating_score
   rating_phrase = if rating_score > 0 then "and rated it *#{rating_score}/5*" else ""
   action = actionNameFor(rating_score)
+  venue = if checkin.venue.venue_name then "at #{checkin.venue.venue_name}" else ""
 
-  return ":beer: *#{user_name}* #{action} *#{beer_name}* from _#{brewery_name}_ #{rating_phrase}" if withName
-  ":beer: *#{beer_name}* from _#{brewery_name}_ #{rating_phrase}"
+  return ":beer: *#{user_name}* #{action} *#{beer_name}* from _#{brewery_name}_ #{rating_phrase} #{venue}" if withName
+  ":beer: *#{beer_name}* from _#{brewery_name}_ #{rating_phrase} #{venue}"
 
 module.exports = (robot) ->
 
