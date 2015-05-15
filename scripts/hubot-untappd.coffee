@@ -12,7 +12,7 @@ _ = require 'lodash'
 cronjob = require("cron").CronJob
 moment = require "moment"
 
-UPDATE_TIME = "00 */10 * * * 0-6" # Sun-Sat job every 10 minutes
+UPDATE_TIME = "00 */10 * * * *" # erry minute of erry day, son
 ROOM = process.env.HUBOT_UNTAPPD_ROOM || "beer"
 
 untappd.setClientId process.env.HUBOT_UNTAPPD_CLIENTID
@@ -37,20 +37,32 @@ getUserFeed = (user, cb) ->
   else
     untappd.userFeed handleUserFeed(user, cb), user_name, 1
 
+availableActionNames = (rating) ->
+  if rating && rating <= 2.0
+    # bad
+    ["choked down a", "managed to finish a", "reluctantly tried a", "kept down a", "shouldn't have had a"]
+  else if !rating || rating <= 4.0
+    # normal
+    ["drank a", "had a", "purchased a", "slammed a", "chugged a", "downed a", "imbibed a", "hammed a", "slurped a"]
+  else
+    # good
+    ["thoroughly enjoyed a", "quenched their thurst with a", "drowned themselves in"]
+
+actionNameFor = (rating) ->
+  possible = availableActionNames(rating)
+  possible[Math.floor(Math.random() * possible.length)]
+
 formatCheckin = (checkin, withName) ->
   beer_name = checkin.beer.beer_name
-  user_name = "#{checkin.user.first_name} #{checkin.user.last_name}"
-  beer_style = checkin.beer.beer_style
+  user_name = "#{checkin.user.first_name} #{checkin.user.last_name.charAt(0)}"
   brewery_name = checkin.brewery.brewery_name
-  imageUrl = checkin.beer.beer_label
-  rating_score = Math.floor checkin.rating_score
-  star_rating = _.times rating_score, () ->
-      ":star:"
-    .join " "
+  rating_score = checkin.rating_score
+  rating_phrase = if rating_score > 0 then "and rated it *#{rating_score}/5*" else ""
+  action = actionNameFor(rating_score)
+  venue = if checkin.venue.venue_name then "at #{checkin.venue.venue_name}" else ""
 
-  date = moment(checkin.created_at).format("LLLL")
-  return "*#{beer_name}* (#{beer_style} by #{brewery_name}) on #{date}\n#{imageUrl} was drunk by #{user_name} who gave it #{star_rating}" if withName
-  "*#{beer_name}* (#{beer_style} by #{brewery_name}) on #{date}\n#{imageUrl} with #{star_rating}"
+  return ":beer: *#{user_name}* #{action} *#{beer_name}* from _#{brewery_name}_ #{rating_phrase} #{venue}" if withName
+  ":beer: *#{beer_name}* from _#{brewery_name}_ #{rating_phrase} #{venue}"
 
 module.exports = (robot) ->
 
@@ -63,7 +75,6 @@ module.exports = (robot) ->
 
   update = () ->
     untappdUserIds = getUntappdUserIds()
-    #console.log "Updating #{untappdUserIds.length} users"
     if untappdUserIds and untappdUserIds.length > 0
       _.each untappdUserIds, (userId) ->
         user = robot.brain.userForId userId
@@ -73,7 +84,7 @@ module.exports = (robot) ->
               checkin.checkin_id > user.untappd.max_id
             .each (checkin) ->
               m = formatCheckin(checkin, true)
-              robot.messageRoom ROOM, ":beer: #{m}"
+              robot.messageRoom ROOM, m
 
   updater = new cronjob UPDATE_TIME,
     -> update()
@@ -118,7 +129,6 @@ module.exports = (robot) ->
     checkins = user.untappd.last_checkins
     return msg.reply("You haven't made any check-in on any beer at untappd yet") if !checkins or checkins.length < 1
     m = ""
-    beerEmote = ":beer:"
     if num is 1
       lastCheckin = _.first checkins # checkins apparently come in reverse order
       m = formatCheckin(lastCheckin, false)
@@ -127,5 +137,4 @@ module.exports = (robot) ->
             formatCheckin(ci, false)
         .take(num)
         .join("\n")
-      beerEmote = ':beers:'
-    msg.reply("Your last #{beerEmote} was #{m}")
+    msg.reply(m)
